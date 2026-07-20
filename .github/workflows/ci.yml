@@ -1,0 +1,22 @@
+name: CI
+on:
+  workflow_call:
+    inputs:
+      language:
+        type: string
+        default: 'python'
+      test_command:
+        type: string
+        default: 'pytest'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        if: inputs.language == 'python'
+        with:
+          python-version: '3.14'
+      - run: pip install -r requirements.txt 2>/dev/null || true
+        if: inputs.language == 'python'
+      - run: ${{ inputs.test_command }}
