@@ -1,0 +1,19 @@
+name: Skill Lint
+on:
+  workflow_call:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate skills
+        run: |
+          errors=0
+          for skill in skills/*/; do
+            [ -d "$skill" ] || continue
+            name=$(basename "$skill")
+            [ -f "$skill/SKILL.md" ] || { echo "❌ $name: missing SKILL.md"; errors=$((errors+1)); continue; }
+            grep -q "^---$" "$skill/SKILL.md" || { echo "❌ $name: missing YAML frontmatter"; errors=$((errors+1)); continue; }
+            echo "✅ $name"
+          done
+          [ $errors -eq 0 ] || exit 1
